@@ -1,4 +1,9 @@
 #!/bin/bash
+# poetry build
+# poetry publish --repository testpypi --build
+# TODO: fix config
+
+#!/bin/bash
 # clear the previous wheel 
 rm -r dist/*
 
