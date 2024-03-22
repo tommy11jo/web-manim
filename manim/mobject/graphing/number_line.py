@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from manim.mobject.opengl.opengl_vectorized_mobject import OpenGLVMobject
-
 __all__ = ["NumberLine", "UnitInterval"]
 
 
@@ -629,7 +627,7 @@ class NumberLine(Line):
         """
         if label_constructor is None:
             label_constructor = self.label_constructor
-        if isinstance(label_tex, (VMobject, OpenGLVMobject)):
+        if isinstance(label_tex, VMobject):
             return label_tex
         else:
             return label_constructor(label_tex, **kwargs)

@@ -30,7 +30,6 @@ from functools import reduce
 from textwrap import dedent
 from typing import Iterable
 
-from manim import config, logger
 from manim.constants import *
 from manim.mobject.geometry.line import Line
 from manim.mobject.svg.svg_mobject import SVGMobject
@@ -211,10 +210,7 @@ class SingleStringMathTex(SVGMobject):
         return self.tex_string
 
     def init_colors(self, propagate_colors=True):
-        if config.renderer == RendererType.OPENGL:
-            super().init_colors()
-        elif config.renderer == RendererType.CAIRO:
-            super().init_colors(propagate_colors=propagate_colors)
+        super().init_colors(propagate_colors=propagate_colors)
 
 
 class MathTex(SingleStringMathTex):

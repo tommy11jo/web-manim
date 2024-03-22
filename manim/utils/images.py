@@ -14,24 +14,15 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-from .. import config
-from ..utils.file_ops import seek_full_path_from_defaults
-
 
 def get_full_raster_image_path(image_file_name: str) -> Path:
-    return seek_full_path_from_defaults(
-        image_file_name,
-        default_dir=config.get_dir("assets_dir"),
-        extensions=[".jpg", ".jpeg", ".png", ".gif", ".ico"],
-    )
+    # web-manim
+    raise Exception("not implemented, maybe use pyodide file system")
 
 
 def get_full_vector_image_path(image_file_name: str) -> Path:
-    return seek_full_path_from_defaults(
-        image_file_name,
-        default_dir=config.get_dir("assets_dir"),
-        extensions=[".svg"],
-    )
+    # web-manim
+    raise Exception("not implemented, maybe use pyodide file system")
 
 
 def drag_pixels(frames: list[np.array]) -> list[np.array]:

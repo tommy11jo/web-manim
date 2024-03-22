@@ -74,10 +74,6 @@ from manim.mobject.text.numbers import DecimalNumber, Integer
 from manim.mobject.text.tex_mobject import MathTex
 from manim.mobject.text.text_mobject import Paragraph
 
-from ..animation.animation import Animation
-from ..animation.composition import AnimationGroup
-from ..animation.creation import Create, Write
-from ..animation.fading import FadeIn
 from ..mobject.types.vectorized_mobject import VGroup, VMobject
 from ..utils.color import BLACK, YELLOW, ManimColor, ParsableManimColor
 from .utils import get_vectorized_mobject_class
@@ -323,7 +319,6 @@ class Table(VGroup):
                     mob_table.insert(0, col_labels)
                 else:
                     # Placeholder to use arrange_in_grid if top_left_entry is not set.
-                    # Import OpenGLVMobject to work with --renderer=opengl
                     dummy_mobject = get_vectorized_mobject_class()()
                     col_labels = [dummy_mobject] + self.col_labels
                     mob_table.insert(0, col_labels)
@@ -884,80 +879,6 @@ class Table(VGroup):
         entry = self.get_entries(pos)
         entry.background_rectangle = bg_cell
         return self
-
-    def create(
-        self,
-        lag_ratio: float = 1,
-        line_animation: Callable[[VMobject | VGroup], Animation] = Create,
-        label_animation: Callable[[VMobject | VGroup], Animation] = Write,
-        element_animation: Callable[[VMobject | VGroup], Animation] = Create,
-        entry_animation: Callable[[VMobject | VGroup], Animation] = FadeIn,
-        **kwargs,
-    ) -> AnimationGroup:
-        """Customized create-type function for tables.
-
-        Parameters
-        ----------
-        lag_ratio
-            The lag ratio of the animation.
-        line_animation
-            The animation style of the table lines, see :mod:`~.creation` for examples.
-        label_animation
-            The animation style of the table labels, see :mod:`~.creation` for examples.
-        element_animation
-            The animation style of the table elements, see :mod:`~.creation` for examples.
-        entry_animation
-            The entry animation of the table background, see :mod:`~.creation` for examples.
-        kwargs
-            Further arguments passed to the creation animations.
-
-        Returns
-        -------
-        :class:`~.AnimationGroup`
-            AnimationGroup containing creation of the lines and of the elements.
-
-        Examples
-        --------
-
-        .. manim:: CreateTableExample
-
-            class CreateTableExample(Scene):
-                def construct(self):
-                    table = Table(
-                        [["First", "Second"],
-                        ["Third","Fourth"]],
-                        row_labels=[Text("R1"), Text("R2")],
-                        col_labels=[Text("C1"), Text("C2")],
-                        include_outer_lines=True)
-                    self.play(table.create())
-                    self.wait()
-        """
-        animations: Sequence[Animation] = [
-            line_animation(
-                VGroup(self.vertical_lines, self.horizontal_lines),
-                **kwargs,
-            ),
-            element_animation(self.elements_without_labels.set_z_index(2), **kwargs),
-        ]
-
-        if self.get_labels():
-            animations += [
-                label_animation(self.get_labels(), **kwargs),
-            ]
-
-        if self.get_entries():
-            for entry in self.elements_without_labels:
-                try:
-                    animations += [
-                        entry_animation(
-                            entry.background_rectangle,
-                            **kwargs,
-                        )
-                    ]
-                except AttributeError:
-                    continue
-
-        return AnimationGroup(*animations, lag_ratio=lag_ratio)
 
     def scale(self, scale_factor: float, **kwargs):
         # h_buff and v_buff must be adjusted so that Table.get_cell

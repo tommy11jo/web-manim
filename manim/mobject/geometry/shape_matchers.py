@@ -8,7 +8,6 @@ from typing import Any
 
 from typing_extensions import Self
 
-from manim import config, logger
 from manim.constants import *
 from manim.mobject.geometry.line import Line
 from manim.mobject.geometry.polygram import RoundedRectangle

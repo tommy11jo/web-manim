@@ -1,89 +1,59 @@
-"""Set the global config and logger."""
-
-from __future__ import annotations
-
-import logging
-from contextlib import contextmanager
-from typing import Any, Generator
-
-from .cli_colors import parse_cli_ctx
+from manim.constants import RendererType
+from ..utils.color.manim_colors import BLACK
 from .logger_utils import make_logger
-from .utils import ManimConfig, ManimFrame, make_config_parser
 
 __all__ = [
     "logger",
     "console",
     "error_console",
     "config",
-    "frame",
-    "tempconfig",
-    "cli_ctx_settings",
 ]
 
-parser = make_config_parser()
-
-# The logger can be accessed from anywhere as manim.logger, or as
-# logging.getLogger("manim").  The console must be accessed as manim.console.
-# Throughout the codebase, use manim.console.print() instead of print().
-# Use error_console to print errors so that it outputs to stderr.
 logger, console, error_console = make_logger(
-    parser["logger"],
-    parser["CLI"]["verbosity"],
+    # no logger for now
 )
-cli_ctx_settings = parse_cli_ctx(parser["CLI_CTX"])
-# TODO: temporary to have a clean terminal output when working with PIL or matplotlib
-logging.getLogger("PIL").setLevel(logging.INFO)
-logging.getLogger("matplotlib").setLevel(logging.INFO)
+# config = {"frame_width": 1600, "frame_height": 900, "pixel_width": 1, "pixel_height": 1}
+# web-manim
+# DO: allow this config to be updated by scene perhaps?
+FRAME_WIDTH = 800
+FRAME_HEIGHT = 800
+# config = {
+#     "frame_width": FRAME_WIDTH,
+#     "frame_height": FRAME_HEIGHT,
+#     "pixel_width": 1,
+#     "pixel_height": 1,
+# }
 
-config = ManimConfig().digest_parser(parser)
-# TODO: to be used in the future - see PR #620
-# https://github.com/ManimCommunity/manim/pull/620
-frame = ManimFrame(config)
+
+class ManimConfig:
+    def __init__(self):
+        self.frame_height = FRAME_HEIGHT
+        self.frame_width = FRAME_WIDTH
+        self.pixel_width = 1
+        self.pixel_height = 1
+        self.frame_x_radius = self.frame_width / 2
+        self.frame_y_radius = self.frame_height / 2
+        self.background_color = BLACK
+        self.background_opacity = 1.0
+
+        self.renderer = RendererType.CAIRO
+
+        # appease
+        self.dry_run = False
+        self.input_file = None
+        self.output_file = None
+        self.media_dir = None
+        self.save_sections = False
+
+    # also make dict-like access and setting work
+    def __getitem__(self, key):
+        try:
+            return getattr(self, key)
+        except AttributeError as e:
+            raise KeyError(f"'ManimConfig' object has no key '{key}'") from e
+
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
 
 
-# This has to go here because it needs access to this module's config
-@contextmanager
-def tempconfig(temp: ManimConfig | dict[str, Any]) -> Generator[None, None, None]:
-    """Context manager that temporarily modifies the global ``config`` object.
-
-    Inside the ``with`` statement, the modified config will be used.  After
-    context manager exits, the config will be restored to its original state.
-
-    Parameters
-    ----------
-    temp
-        Object whose keys will be used to temporarily update the global
-        ``config``.
-
-    Examples
-    --------
-
-    Use ``with tempconfig({...})`` to temporarily change the default values of
-    certain config options.
-
-    .. code-block:: pycon
-
-       >>> config["frame_height"]
-       8.0
-       >>> with tempconfig({"frame_height": 100.0}):
-       ...     print(config["frame_height"])
-       ...
-       100.0
-       >>> config["frame_height"]
-       8.0
-
-    """
-    global config
-    original = config.copy()
-
-    temp = {k: v for k, v in temp.items() if k in original}
-
-    # In order to change the config that every module has access to, use
-    # update(), DO NOT use assignment.  Assigning config = some_dict will just
-    # make the local variable named config point to a new dictionary, it will
-    # NOT change the dictionary that every module has a reference to.
-    config.update(temp)
-    try:
-        yield
-    finally:
-        config.update(original)  # update, not assignment!
+config = ManimConfig()

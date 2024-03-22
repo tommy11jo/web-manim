@@ -16,7 +16,7 @@ import numpy as np
 from PIL import Image
 from scipy.spatial.distance import pdist
 
-from .. import config, logger
+from .. import config
 from ..constants import *
 from ..mobject.mobject import Mobject
 from ..mobject.types.image_mobject import AbstractImageMobject
@@ -80,7 +80,6 @@ class Camera:
         pixel_width: int | None = None,
         frame_height: float | None = None,
         frame_width: float | None = None,
-        frame_rate: float | None = None,
         background_color: ParsableManimColor | None = None,
         background_opacity: float | None = None,
         **kwargs,
@@ -109,10 +108,6 @@ class Camera:
         if frame_width is None:
             frame_width = config["frame_width"]
         self.frame_width = frame_width
-
-        if frame_rate is None:
-            frame_rate = config["frame_rate"]
-        self.frame_rate = frame_rate
 
         if background_color is None:
             self._background_color = ManimColor.parse(config["background_color"])
@@ -661,6 +656,7 @@ class Camera:
         Camera
             The camera object
         """
+        print("points are:", vmobject.points)
         self.set_cairo_context_path(ctx, vmobject)
         self.apply_stroke(ctx, vmobject, background=True)
         self.apply_fill(ctx, vmobject)

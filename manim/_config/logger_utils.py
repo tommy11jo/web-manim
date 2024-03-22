@@ -9,6 +9,7 @@ Both ``logger`` and ``console`` use the ``rich`` library to produce rich text
 format.
 
 """
+
 from __future__ import annotations
 
 import configparser
@@ -51,8 +52,8 @@ Loading the default color configuration.[/logging.level.error]
 
 
 def make_logger(
-    parser: configparser.SectionProxy,
-    verbosity: str,
+    # parser: configparser.SectionProxy,
+    # verbosity: str,
 ) -> tuple[logging.Logger, Console, Console]:
     """Make the manim logger and console.
 
@@ -82,22 +83,21 @@ def make_logger(
 
     """
     # Throughout the codebase, use console.print() instead of print()
-    theme = parse_theme(parser)
-    console = Console(theme=theme)
+    console = Console()
 
-    error_console = Console(theme=theme, stderr=True)
+    error_console = Console(stderr=True)
 
     # set the rich handler
     rich_handler = RichHandler(
         console=console,
-        show_time=parser.getboolean("log_timestamps"),
+        # show_time=parser.getboolean("log_timestamps"),
         keywords=HIGHLIGHTED_KEYWORDS,
     )
 
     # finally, the logger
     logger = logging.getLogger("manim")
     logger.addHandler(rich_handler)
-    logger.setLevel(verbosity)
+    # logger.setLevel(verbosity)
 
     return logger, console, error_console
 

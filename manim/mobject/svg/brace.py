@@ -13,12 +13,8 @@ from manim._config import config
 from manim.mobject.geometry.arc import Arc
 from manim.mobject.geometry.line import Line
 from manim.mobject.mobject import Mobject
-from manim.mobject.opengl.opengl_compatibility import ConvertToOpenGL
 from manim.mobject.text.tex_mobject import MathTex, Tex
 
-from ...animation.composition import AnimationGroup
-from ...animation.fading import FadeIn
-from ...animation.growing import GrowFromCenter
 from ...constants import *
 from ...mobject.types.vectorized_mobject import VMobject
 from ...utils.color import BLACK
@@ -157,7 +153,7 @@ class Brace(VMobjectFromSVGPath):
         return vect / np.linalg.norm(vect)
 
 
-class BraceLabel(VMobject, metaclass=ConvertToOpenGL):
+class BraceLabel(VMobject):
     """Create a brace with a label attached.
 
     Parameters
@@ -207,9 +203,6 @@ class BraceLabel(VMobject, metaclass=ConvertToOpenGL):
 
         self.brace.put_at_tip(self.label)
         self.add(self.brace, self.label)
-
-    def creation_anim(self, label_anim=FadeIn, brace_anim=GrowFromCenter):
-        return AnimationGroup(brace_anim(self.brace), label_anim(self.label))
 
     def shift_brace(self, obj, **kwargs):
         if isinstance(obj, list):

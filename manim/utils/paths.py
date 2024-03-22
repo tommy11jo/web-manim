@@ -16,7 +16,6 @@ import numpy as np
 
 from ..constants import OUT
 from ..utils.bezier import interpolate
-from ..utils.deprecation import deprecated_params
 from ..utils.space_ops import rotation_matrix
 
 STRAIGHT_PATH_THRESHOLD = 0.01
@@ -24,13 +23,6 @@ STRAIGHT_PATH_THRESHOLD = 0.01
 PATH_FUNC_TYPE = Callable[[np.ndarray, np.ndarray, float], np.ndarray]
 
 
-# Remove `*args` and the `if` inside the functions when removing deprecation
-@deprecated_params(
-    params="start_points, end_points, alpha",
-    since="v0.14",
-    until="v0.15",
-    message="Straight path is now returning interpolating function to make it consistent with other path functions. Use straight_path()(a,b,c) instead of straight_path(a,b,c).",
-)
 def straight_path(*args) -> PATH_FUNC_TYPE:
     """Simplest path function. Each point in a set goes in a straight path toward its destination.
 

@@ -14,13 +14,9 @@ from typing import Hashable, Iterable
 import networkx as nx
 import numpy as np
 
-from manim.animation.composition import AnimationGroup
-from manim.animation.creation import Create, Uncreate
 from manim.mobject.geometry.arc import Dot, LabeledDot
 from manim.mobject.geometry.line import Line
-from manim.mobject.mobject import Mobject, override_animate
-from manim.mobject.opengl.opengl_compatibility import ConvertToOpenGL
-from manim.mobject.opengl.opengl_mobject import OpenGLMobject
+from manim.mobject.mobject import Mobject
 from manim.mobject.text.tex_mobject import MathTex
 from manim.mobject.types.vectorized_mobject import VMobject
 from manim.utils.color import BLACK
@@ -212,7 +208,7 @@ def _tree_layout(
     return {v: (np.array([x, y, 0]) - center) * sf for v, (x, y) in pos.items()}
 
 
-class GenericGraph(VMobject, metaclass=ConvertToOpenGL):
+class GenericGraph(VMobject):
     """Abstract base class for graphs (that is, a collection of vertices
     connected with edges).
 
@@ -437,7 +433,7 @@ class GenericGraph(VMobject, metaclass=ConvertToOpenGL):
             label = MathTex(vertex, fill_color=label_fill_color)
         elif vertex in self._labels:
             label = self._labels[vertex]
-        elif not isinstance(label, (Mobject, OpenGLMobject)):
+        elif not isinstance(label, Mobject):
             label = None
 
         base_vertex_config = copy(self.default_vertex_config)
@@ -636,26 +632,6 @@ class GenericGraph(VMobject, metaclass=ConvertToOpenGL):
             )
         ]
 
-    @override_animate(add_vertices)
-    def _add_vertices_animation(self, *args, anim_args=None, **kwargs):
-        if anim_args is None:
-            anim_args = {}
-
-        animation = anim_args.pop("animation", Create)
-
-        vertex_mobjects = self._create_vertices(*args, **kwargs)
-
-        def on_finish(scene: Scene):
-            for v in vertex_mobjects:
-                scene.remove(v[-1])
-                self._add_created_vertex(*v)
-
-        return AnimationGroup(
-            *(animation(v[-1], **anim_args) for v in vertex_mobjects),
-            group=self,
-            _on_finish=on_finish,
-        )
-
     def _remove_vertex(self, vertex):
         """Remove a vertex (as well as all incident edges) from the graph.
 
@@ -716,18 +692,6 @@ class GenericGraph(VMobject, metaclass=ConvertToOpenGL):
         for v in vertices:
             mobjects.extend(self._remove_vertex(v).submobjects)
         return self.get_group_class()(*mobjects)
-
-    @override_animate(remove_vertices)
-    def _remove_vertices_animation(self, *vertices, anim_args=None):
-        if anim_args is None:
-            anim_args = {}
-
-        animation = anim_args.pop("animation", Uncreate)
-
-        mobjects = self.remove_vertices(*vertices)
-        return AnimationGroup(
-            *(animation(mobj, **anim_args) for mobj in mobjects), group=self
-        )
 
     def _add_edge(
         self,
@@ -841,17 +805,6 @@ class GenericGraph(VMobject, metaclass=ConvertToOpenGL):
         )
         return self.get_group_class()(*added_mobjects)
 
-    @override_animate(add_edges)
-    def _add_edges_animation(self, *args, anim_args=None, **kwargs):
-        if anim_args is None:
-            anim_args = {}
-        animation = anim_args.pop("animation", Create)
-
-        mobjects = self.add_edges(*args, **kwargs)
-        return AnimationGroup(
-            *(animation(mobj, **anim_args) for mobj in mobjects), group=self
-        )
-
     def _remove_edge(self, edge: tuple[Hashable]):
         """Remove an edge from the graph.
 
@@ -895,16 +848,6 @@ class GenericGraph(VMobject, metaclass=ConvertToOpenGL):
         """
         edge_mobjects = [self._remove_edge(edge) for edge in edges]
         return self.get_group_class()(*edge_mobjects)
-
-    @override_animate(remove_edges)
-    def _remove_edges_animation(self, *edges, anim_args=None):
-        if anim_args is None:
-            anim_args = {}
-
-        animation = anim_args.pop("animation", Uncreate)
-
-        mobjects = self.remove_edges(*edges)
-        return AnimationGroup(*(animation(mobj, **anim_args) for mobj in mobjects))
 
     @classmethod
     def from_networkx(

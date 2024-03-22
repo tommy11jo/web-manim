@@ -70,7 +70,6 @@ from __future__ import annotations
 
 __all__ = ["MovingCameraScene"]
 
-from manim.animation.animation import Animation
 
 from ..camera.moving_camera import MovingCamera
 from ..scene.scene import Scene

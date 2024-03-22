@@ -50,7 +50,6 @@ import numpy as np
 from typing_extensions import Self
 
 from manim.constants import *
-from manim.mobject.opengl.opengl_compatibility import ConvertToOpenGL
 from manim.mobject.types.vectorized_mobject import VGroup, VMobject
 from manim.utils.color import BLACK, BLUE, RED, WHITE, ParsableManimColor
 from manim.utils.iterables import adjacent_pairs
@@ -75,7 +74,7 @@ if TYPE_CHECKING:
     )
 
 
-class TipableVMobject(VMobject, metaclass=ConvertToOpenGL):
+class TipableVMobject(VMobject):
     """Meant for shared functionality between Arc and Line.
     Functionality can be classified broadly into these groups:
 
@@ -966,7 +965,7 @@ class Annulus(Circle):
     init_points = generate_points
 
 
-class CubicBezier(VMobject, metaclass=ConvertToOpenGL):
+class CubicBezier(VMobject):
     """A cubic Bézier curve.
 
     Example
@@ -1001,7 +1000,7 @@ class CubicBezier(VMobject, metaclass=ConvertToOpenGL):
         self.add_cubic_bezier_curve(start_anchor, start_handle, end_handle, end_anchor)
 
 
-class ArcPolygon(VMobject, metaclass=ConvertToOpenGL):
+class ArcPolygon(VMobject):
     """A generalized polygon allowing for points to be connected with arcs.
 
     This version tries to stick close to the way :class:`Polygon` is used. Points
@@ -1120,7 +1119,7 @@ class ArcPolygon(VMobject, metaclass=ConvertToOpenGL):
         self.arcs = arcs
 
 
-class ArcPolygonFromArcs(VMobject, metaclass=ConvertToOpenGL):
+class ArcPolygonFromArcs(VMobject):
     """A generalized polygon allowing for points to be connected with arcs.
 
     This version takes in pre-defined arcs to generate the arcpolygon and introduces
